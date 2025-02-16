@@ -1,4 +1,4 @@
-import AWS from "aws-sdk";
+import { DetectLabelsCommand, RekognitionClient } from "@aws-sdk/client-rekognition";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -21,20 +21,20 @@ app.use(
 
 const upload = multer({ dest: "uploads/" });
 
-AWS.config.update({
-  accessKeyId: process.env.AWS_KEY,
-  secretAccessKey: process.env.AWS_SECRET,
+const rekognitionClient = new RekognitionClient({
   region: "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_KEY ?? "",
+    secretAccessKey: process.env.AWS_SECRET ?? "",
+  },
 });
-const rekognition = new AWS.Rekognition();
 
 app.get("/test", (_, res) => {
   console.log("Server is running...");
   res.send("OK");
 });
 
-app.post("/analysis", upload.single("image"), (req, res) => {
-  console.log("hello WOrld");
+app.post("/analysis", upload.single("image"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
@@ -42,22 +42,24 @@ app.post("/analysis", upload.single("image"), (req, res) => {
   const imagePath = req.file.path;
   const imageBuffer = fs.readFileSync(imagePath);
 
-  const params = {
+  const params: any = {
     Image: { Bytes: imageBuffer },
     MaxLabels: 10,
   };
 
-  rekognition.detectLabels(params, (err, data) => {
-    fs.unlink(imagePath, () => {});
-
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const command = new DetectLabelsCommand(params);
+    const data = await rekognitionClient.send(command);
 
     console.log({ data });
 
+    fs.unlink(imagePath, () => {});
+
     res.json(data);
-  });
+  } catch (err: any) {
+    fs.unlink(imagePath, () => {});
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.listen(3000, () => {
