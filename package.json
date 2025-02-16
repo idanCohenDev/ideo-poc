@@ -1,0 +1,51 @@
+{
+  "name": "server",
+  "version": "1.0.1",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec 'npm run start'",
+    "build": "rimraf ./build && tsc",
+    "start": "npm run build && node build/api.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "exec": "node --loader ts-node/esm src/api.ts",
+    "prisma-generate-kiosk": "npx prisma generate --schema=prisma/kiosk/schema.prisma",
+    "prisma-generate-cashwiz": "npx prisma generate --schema=prisma/cashwiz/schema.prisma",
+    "prisma-pull-kiosk": "npx prisma db pull --schema=prisma/kiosk/schema.prisma",
+    "prisma-pull-cashwiz": "npx prisma db pull --schema=prisma/cashwiz/schema.prisma",
+    "prisma-generate": "npm run prisma-generate-kiosk && npm run prisma-generate-cashwiz",
+    "prisma-push": "npx prisma db push --schema=prisma/kiosk/schema.prisma && npx prisma db push --schema=prisma/cashwiz/schema.prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.16",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.12",
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.17.0",
+    "@trpc/server": "^10.43.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.9.1",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.6.8",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.7",
+    "express-fileupload": "^1.5.1",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "prisma": "^5.17.0"
+  }
+}
